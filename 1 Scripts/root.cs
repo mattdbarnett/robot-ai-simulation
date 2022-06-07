@@ -19,19 +19,24 @@ public class root : Node2D
 	{
 		food = (PackedScene)ResourceLoader.Load("res://0 Scenes/food.tscn");
 
-		Random rnd = new Random();
-		int x = rnd.Next(0, 1920);
-		int y = rnd.Next(0, 1080);
-		Area2D newInstance = (Area2D)food.Instance();
-		
-		AddChild(newInstance);
-		newInstance.Position = new Vector2(x, y);
+		for (int i = 0; i < 10; i++) 
+			{
+			Random rnd = new Random();
+			int x = rnd.Next(0, 1920);
+			int y = rnd.Next(0, 1080);
+			Area2D newInstance = (Area2D)food.Instance();
+			
+			AddChild(newInstance);
+			newInstance.Position = new Vector2(x, y);
+			}
 
 	}
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(float delta)
+	{
+		if(Input.IsActionJustPressed("ui_right")) {
+			createFood();
+		}
+	}
 }
