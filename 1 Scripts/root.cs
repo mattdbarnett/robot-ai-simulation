@@ -14,7 +14,7 @@ public class root : Node2D
 	Vector2 velocity = new Vector2(1,1);
 	public Godot.Collections.Array<Godot.Area2D> foodList = new Godot.Collections.Array<Godot.Area2D>();
 	public Godot.Collections.Array<Vector2> foodPosList = new Godot.Collections.Array<Vector2>();
-	public Godot.Collections.Array<Godot.KinematicBody2D> robotList = new Godot.Collections.Array<Godot.KinematicBody2D>();
+	public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -51,8 +51,9 @@ public class root : Node2D
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
-			KinematicBody2D newInstance = (KinematicBody2D)robot.Instance();
+			robot newInstance = (robot)robot.Instance();
 			
+			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble()));
 			robotList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
@@ -78,7 +79,7 @@ public class root : Node2D
 			}
 			Vector2 distance = closestFood - currentRobot.Position;
 			currentRobot.LookAt(closestFood);
-			currentRobot.MoveAndSlide(distance * robotSpeed);
+			currentRobot.MoveAndSlide(distance * currentRobot.getSpeed());
 		}
 	}
 
