@@ -14,6 +14,11 @@ config/name="ai-godot-project"
 run/main_scene="res://0 Scenes/root.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Globals="*res://1 Scripts/Globals.cs"
+GM="*res://0 Scenes/GM.tscn"
+
 [display]
 
 window/size/width=1920

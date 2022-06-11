@@ -10,15 +10,16 @@ public class root : Node2D
 	PackedScene food;
 	PackedScene robot;
 
-	float robotSpeed = 0.5f;
-	Vector2 velocity = new Vector2(1,1);
-	public Godot.Collections.Array<Godot.Area2D> foodList = new Godot.Collections.Array<Godot.Area2D>();
-	public Godot.Collections.Array<Vector2> foodPosList = new Godot.Collections.Array<Vector2>();
 	public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
+
+	Globals globals = null;
+	//public Singleton globalVariables = GetNode<globals>("/root/globals");
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_EnterTree();
+		globals = (Globals)GetNode("/root/GM");
 		createFood();
 		createRobots();
 	}
@@ -32,12 +33,13 @@ public class root : Node2D
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
-			Area2D newInstance = (Area2D)food.Instance();
-			
-			foodList.Add(newInstance);
+			food newInstance = (food)food.Instance();
+			GD.Print(newInstance);
+			newInstance.setID(globals.foodList.Count);
+			globals.foodList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
-			foodPosList.Add(newInstance.Position);
+			//foodPosList.Add(newInstance.Position);
 			}
 
 	}
@@ -61,20 +63,19 @@ public class root : Node2D
 
 	}
 
-	public void controlRobots(float delta)
+	public void controlRobots()
 	{	
-		robotList[0].LookAt(foodPosList[0]);
 		for(int i = 0; i < robotList.Count; i++)
 		{
 			var currentRobot = robotList[i];
 			float closestDistance = 999999;
 			Vector2 closestFood = new Vector2(0, 0);
-			for(int y = 0; y < foodList.Count; y++) {
-				Vector2 currentFood = foodPosList[y];
-				float currentDistance = currentRobot.Position.DistanceTo(currentFood);
+			for(int y = 0; y < globals.foodList.Count; y++) {
+				var currentFood = globals.foodList[y];
+				float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
 				if(currentDistance < closestDistance) {
 					closestDistance = currentDistance;
-					closestFood = currentFood;
+					closestFood = currentFood.Position;
 				}
 			}
 			Vector2 distance = closestFood - currentRobot.Position;
@@ -86,7 +87,9 @@ public class root : Node2D
 // Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(float delta)
 	{
-		controlRobots(delta);
+		if(globals.foodList.Count > 0) {
+			controlRobots();
+		}
 		if(Input.IsActionJustPressed("ui_right")) {
 			createFood();
 		}
