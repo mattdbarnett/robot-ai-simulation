@@ -3,23 +3,23 @@ using System;
 
 public class root : Node2D
 {
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
 	Random rnd = new Random();
+	Globals globals = null;
+
+	// Instanced elements
 	PackedScene food;
 	PackedScene robot;
 
+	// List of all robot elements
 	public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
 
-	Globals globals = null;
-	//public Singleton globalVariables = GetNode<globals>("/root/globals");
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		_EnterTree();
 		globals = (Globals)GetNode("/root/GM");
+		
 		createFood();
 		createRobots();
 	}
@@ -28,19 +28,18 @@ public class root : Node2D
 	{
 		food = (PackedScene)ResourceLoader.Load("res://0 Scenes/food.tscn");
 
-		for (int i = 0; i < 10; i++) 
-			{
+		for (int i = 0; i < 10; i++) {
+
+			// Create random coordinates for where to spawn current food
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
+
 			food newInstance = (food)food.Instance();
-			GD.Print(newInstance);
-			newInstance.setID(globals.foodList.Count);
 			globals.foodList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
-			//foodPosList.Add(newInstance.Position);
-			}
+		}
 
 	}
 
@@ -48,25 +47,26 @@ public class root : Node2D
 	{
 		robot = (PackedScene)ResourceLoader.Load("res://0 Scenes/robot.tscn");
 
-		for (int i = 0; i < 25; i++) 
-			{
+		for (int i = 0; i < 25; i++) {
+
+			// Create random coordinates for where to spawn current robot
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
+
 			robot newInstance = (robot)robot.Instance();
-			
 			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble()));
 			robotList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
-			}
+		}
 
 	}
 
 	public void controlRobots()
 	{	
-		for(int i = 0; i < robotList.Count; i++)
-		{
+		// Find closest food, look at it and move towards it
+		for(int i = 0; i < robotList.Count; i++) {
 			var currentRobot = robotList[i];
 			float closestDistance = 999999;
 			Vector2 closestFood = new Vector2(0, 0);
