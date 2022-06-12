@@ -14,7 +14,7 @@ public class root : Node2D
 	// Instanced elements
 	PackedScene food;
 	PackedScene robot;
-
+	PackedScene home;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -25,15 +25,45 @@ public class root : Node2D
 		seasonLabel = (Label)GetNode("UI/statsPanel/seasonLabel");
 		robotsLabel = (Label)GetNode("UI/statsPanel/robotsLabel");
 		
-		createFood();
+		createFood(10);
 		createRobots();
+		createHomes();
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _PhysicsProcess(float delta)
+	{
+
+		controlRobots();
+		updateUI();
+
+		if(globals.foodList.Count == 0) {
+			roundOver = true;
+		}
+
+		if(roundOver == true) {
+			deathCheck();
+			drainHunger();
+			globals.iterateRound();
+			if(globals.currentMode == "winter") {
+				createFood(3);
+				roundOver = false;
+			} else {
+				createFood(10);
+				roundOver = false;
+			}
+		}
+
+		if(Input.IsActionJustPressed("ui_right")) {
+			createFood(10);
+		}
 	}
 	
-	private void createFood()
+	private void createFood(int sum)
 	{
 		food = (PackedScene)ResourceLoader.Load("res://0 Scenes/food.tscn");
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < sum; i++) {
 
 			// Create random coordinates for where to spawn current food
 			Random rnd = new Random();
@@ -68,69 +98,42 @@ public class root : Node2D
 
 	}
 
-	public void controlRobots()
-	{	
-		if(globals.currentMode == "winter") {
+	private void createHomes()
+	{
+		home = (PackedScene)ResourceLoader.Load("res://0 Scenes/home.tscn");
 
-			var deadRobotList = new Godot.Collections.Array<robot>();
+		for (int i = 0; i < 3; i++) {
 
-			for(int i = 0; i < globals.robotList.Count; i++) {
-				var currentRobot = globals.robotList[i];
-				if(currentRobot.getHunger() <= 0) {
-					deadRobotList.Add(currentRobot);
-				}
-			}
+			// Create random coordinates for where to spawn current robot
+			Random rnd = new Random();
+			int x = rnd.Next(0, 1920);
+			int y = rnd.Next(0, 1080);
 
-			for(int x = 0; x < deadRobotList.Count; x++)  {
-				deadRobotList[x].killSelf();
-			}
-
-			roundOver = true;
-		} else {
-			// Find closest food, look at it and move towards it
-			for(int i = 0; i < globals.robotList.Count; i++) {
-				var currentRobot = globals.robotList[i];
-				float closestDistance = 999999;
-				Vector2 closestFood = new Vector2(0, 0);
-				for(int y = 0; y < globals.foodList.Count; y++) {
-					var currentFood = globals.foodList[y];
-					float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
-					if(currentDistance < closestDistance) {
-						closestDistance = currentDistance;
-						closestFood = currentFood.Position;
-					}
-				}
-				Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
-				currentRobot.LookAt(closestFood);
-				Vector2 velocity = direction * currentRobot.getSpeed();
-				currentRobot.MoveAndSlide(velocity);
-			}
+			Area2D newInstance = (Area2D)home.Instance();
+			AddChild(newInstance);
+			newInstance.Position = new Vector2(x, y);
 		}
 	}
 
-// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(float delta)
-	{
-
-		controlRobots();
-		updateUI();
-
-		if((globals.currentMode != "winter") && (globals.foodList.Count == 0)) {
-			roundOver = true;
-		}
-
-		if(roundOver == true) {
-			globals.iterateRound();
-			if(globals.currentMode == "winter") {
-				roundOver = false;
-			} else {
-				createFood();
-				roundOver = false;
+	public void controlRobots()
+	{	
+		// Find closest food, look at it and move towards it
+		for(int i = 0; i < globals.robotList.Count; i++) {
+			var currentRobot = globals.robotList[i];
+			float closestDistance = 999999;
+			Vector2 closestFood = new Vector2(0, 0);
+			for(int y = 0; y < globals.foodList.Count; y++) {
+				var currentFood = globals.foodList[y];
+				float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
+				if(currentDistance < closestDistance) {
+					closestDistance = currentDistance;
+					closestFood = currentFood.Position;
+				}
 			}
-		}
-
-		if(Input.IsActionJustPressed("ui_right")) {
-			createFood();
+			Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
+			currentRobot.LookAt(closestFood);
+			Vector2 velocity = direction * currentRobot.getSpeed();
+			currentRobot.MoveAndSlide(velocity);
 		}
 	}
 
@@ -138,5 +141,31 @@ public class root : Node2D
 		roundLabel.Text = globals.currentRound.ToString();
 		seasonLabel.Text = globals.currentMode.Capitalize();
 		robotsLabel.Text = globals.robotList.Count.ToString();
+	}
+
+	public void drainHunger() {
+		for(int i = 0; i < globals.robotList.Count; i++) {
+			var currentRobot = globals.robotList[i];
+			int drain = 1;
+			if(globals.currentMode == "winter") {
+				drain = 2;
+			}
+			currentRobot.setHunger(currentRobot.getHunger() - drain);
+		}
+	}
+
+	public void deathCheck() {
+		var deadRobotList = new Godot.Collections.Array<robot>();
+
+		for(int i = 0; i < globals.robotList.Count; i++) {
+			var currentRobot = globals.robotList[i];
+			if(currentRobot.getHunger() <= 0) {
+					deadRobotList.Add(currentRobot);
+			}
+		}
+
+		for(int x = 0; x < deadRobotList.Count; x++)  {
+			deadRobotList[x].killSelf();
+		}
 	}
 }

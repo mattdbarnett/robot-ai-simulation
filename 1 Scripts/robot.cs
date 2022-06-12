@@ -7,7 +7,7 @@ public class robot : KinematicBody2D
 
     // Robot Characteristics
     float speed = 0.5f;
-	int hunger = 0;
+	int hunger = 5;
     byte[] robotColour = new byte[3];
 
     // Robot Elements
@@ -65,7 +65,7 @@ public class robot : KinematicBody2D
         speed = newSpeed;
     }
 
-    public float getHunger() {
+    public int getHunger() {
         return hunger;
     }
 
