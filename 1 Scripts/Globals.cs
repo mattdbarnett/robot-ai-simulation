@@ -19,7 +19,7 @@ public class Globals : Node
         currentMode = "spring";
     }
 
-    public void interateRound() {
+    public void iterateRound() {
         currentRound += 1;
         switch(currentMode) {
             case "spring":

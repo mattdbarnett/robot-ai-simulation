@@ -5,8 +5,11 @@ public class root : Node2D
 {
 	Random rnd = new Random();
 	Globals globals = null;
-
 	bool roundOver = false;
+
+	Label roundLabel = null;
+	Label seasonLabel = null;
+	Label robotsLabel = null;
 
 	// Instanced elements
 	PackedScene food;
@@ -18,6 +21,9 @@ public class root : Node2D
 	{
 		_EnterTree();
 		globals = (Globals)GetNode("/root/GM");
+		roundLabel = (Label)GetNode("UI/statsPanel/roundLabel");
+		seasonLabel = (Label)GetNode("UI/statsPanel/seasonLabel");
+		robotsLabel = (Label)GetNode("UI/statsPanel/robotsLabel");
 		
 		createFood();
 		createRobots();
@@ -70,7 +76,6 @@ public class root : Node2D
 
 			for(int i = 0; i < globals.robotList.Count; i++) {
 				var currentRobot = globals.robotList[i];
-				GD.Print(i);
 				if(currentRobot.getHunger() <= 0) {
 					deadRobotList.Add(currentRobot);
 				}
@@ -80,7 +85,7 @@ public class root : Node2D
 				deadRobotList[x].killSelf();
 			}
 
-			globals.interateRound();
+			roundOver = true;
 		} else {
 			// Find closest food, look at it and move towards it
 			for(int i = 0; i < globals.robotList.Count; i++) {
@@ -95,7 +100,6 @@ public class root : Node2D
 						closestFood = currentFood.Position;
 					}
 				}
-				//Vector2 distance = closestFood - currentRobot.Position;
 				Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
 				currentRobot.LookAt(closestFood);
 				Vector2 velocity = direction * currentRobot.getSpeed();
@@ -109,14 +113,14 @@ public class root : Node2D
 	{
 
 		controlRobots();
+		updateUI();
 
 		if((globals.currentMode != "winter") && (globals.foodList.Count == 0)) {
 			roundOver = true;
 		}
 
 		if(roundOver == true) {
-			globals.interateRound();
-			GD.Print(globals.currentMode);
+			globals.iterateRound();
 			if(globals.currentMode == "winter") {
 				roundOver = false;
 			} else {
@@ -125,32 +129,14 @@ public class root : Node2D
 			}
 		}
 
-		// if(roundOver == false) {
-		// 	controlRobots();
-		// } else {
-		// 	globals.interateRound();
-		// 	GD.Print(globals.currentMode);
-		// 	if((globals.currentMode != "winter")) {
-		// 		createFood();
-		// 		roundOver = false;
-		// 	}
-		// }
-
-		// if(globals.currentMode != "winter") {
-		// 	if(globals.foodList.Count > 0) {
-		// 		controlRobots();
-		// 	} else {
-		// 		globals.currentRound += 1;
-		// 		if(globals.currentRound % 5 == 0) {
-		// 			globals.currentMode = "winter";
-		// 		} else {
-		// 			createFood();
-		// 		}
-		// 	}
-		// }
-
 		if(Input.IsActionJustPressed("ui_right")) {
 			createFood();
 		}
+	}
+
+	public void updateUI() {
+		roundLabel.Text = globals.currentRound.ToString();
+		seasonLabel.Text = globals.currentMode.Capitalize();
+		robotsLabel.Text = globals.robotList.Count.ToString();
 	}
 }

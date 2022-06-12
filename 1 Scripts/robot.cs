@@ -42,8 +42,6 @@ public class robot : KinematicBody2D
     // }
 
     public void _on_Area2D_area_entered(Area2D area) {
-        GD.Print("AREA ENTERED");
-        GD.Print(area.Name);
         if(area.Name.Contains("foodroot")) {
             hunger += 1;
             globals.foodList.Remove(area);
@@ -52,7 +50,6 @@ public class robot : KinematicBody2D
     }
 
     public void _on_robotarea_body_entered(Area2D area) {
-        GD.Print("OBJECT ENTERED");
         if(area.Name == "foodroot") {
             hunger += 1;
             globals.foodList.Remove(area);
@@ -77,7 +74,6 @@ public class robot : KinematicBody2D
     }
 
     public void killSelf() {
-        GD.Print("death");
         globals.robotList.Remove(this);
         QueueFree();
     }
