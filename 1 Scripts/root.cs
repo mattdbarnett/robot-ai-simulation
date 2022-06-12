@@ -6,12 +6,11 @@ public class root : Node2D
 	Random rnd = new Random();
 	Globals globals = null;
 
+	bool roundOver = false;
+
 	// Instanced elements
 	PackedScene food;
 	PackedScene robot;
-
-	// List of all robot elements
-	public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
 
 	
 	// Called when the node enters the scene tree for the first time.
@@ -55,8 +54,8 @@ public class root : Node2D
 			int y = rnd.Next(0, 1080);
 
 			robot newInstance = (robot)robot.Instance();
-			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble()));
-			robotList.Add(newInstance);
+			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble() * 250));
+			globals.robotList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
 		}
@@ -65,31 +64,91 @@ public class root : Node2D
 
 	public void controlRobots()
 	{	
-		// Find closest food, look at it and move towards it
-		for(int i = 0; i < robotList.Count; i++) {
-			var currentRobot = robotList[i];
-			float closestDistance = 999999;
-			Vector2 closestFood = new Vector2(0, 0);
-			for(int y = 0; y < globals.foodList.Count; y++) {
-				var currentFood = globals.foodList[y];
-				float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
-				if(currentDistance < closestDistance) {
-					closestDistance = currentDistance;
-					closestFood = currentFood.Position;
+		if(globals.currentMode == "winter") {
+
+			var deadRobotList = new Godot.Collections.Array<robot>();
+
+			for(int i = 0; i < globals.robotList.Count; i++) {
+				var currentRobot = globals.robotList[i];
+				GD.Print(i);
+				if(currentRobot.getHunger() <= 0) {
+					deadRobotList.Add(currentRobot);
 				}
 			}
-			Vector2 distance = closestFood - currentRobot.Position;
-			currentRobot.LookAt(closestFood);
-			currentRobot.MoveAndSlide(distance * currentRobot.getSpeed());
+
+			for(int x = 0; x < deadRobotList.Count; x++)  {
+				deadRobotList[x].killSelf();
+			}
+
+			globals.interateRound();
+		} else {
+			// Find closest food, look at it and move towards it
+			for(int i = 0; i < globals.robotList.Count; i++) {
+				var currentRobot = globals.robotList[i];
+				float closestDistance = 999999;
+				Vector2 closestFood = new Vector2(0, 0);
+				for(int y = 0; y < globals.foodList.Count; y++) {
+					var currentFood = globals.foodList[y];
+					float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
+					if(currentDistance < closestDistance) {
+						closestDistance = currentDistance;
+						closestFood = currentFood.Position;
+					}
+				}
+				//Vector2 distance = closestFood - currentRobot.Position;
+				Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
+				currentRobot.LookAt(closestFood);
+				Vector2 velocity = direction * currentRobot.getSpeed();
+				currentRobot.MoveAndSlide(velocity);
+			}
 		}
 	}
 
 // Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(float delta)
 	{
-		if(globals.foodList.Count > 0) {
-			controlRobots();
+
+		controlRobots();
+
+		if((globals.currentMode != "winter") && (globals.foodList.Count == 0)) {
+			roundOver = true;
 		}
+
+		if(roundOver == true) {
+			globals.interateRound();
+			GD.Print(globals.currentMode);
+			if(globals.currentMode == "winter") {
+				roundOver = false;
+			} else {
+				createFood();
+				roundOver = false;
+			}
+		}
+
+		// if(roundOver == false) {
+		// 	controlRobots();
+		// } else {
+		// 	globals.interateRound();
+		// 	GD.Print(globals.currentMode);
+		// 	if((globals.currentMode != "winter")) {
+		// 		createFood();
+		// 		roundOver = false;
+		// 	}
+		// }
+
+		// if(globals.currentMode != "winter") {
+		// 	if(globals.foodList.Count > 0) {
+		// 		controlRobots();
+		// 	} else {
+		// 		globals.currentRound += 1;
+		// 		if(globals.currentRound % 5 == 0) {
+		// 			globals.currentMode = "winter";
+		// 		} else {
+		// 			createFood();
+		// 		}
+		// 	}
+		// }
+
 		if(Input.IsActionJustPressed("ui_right")) {
 			createFood();
 		}

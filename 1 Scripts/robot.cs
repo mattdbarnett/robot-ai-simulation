@@ -7,16 +7,19 @@ public class robot : KinematicBody2D
 
     // Robot Characteristics
     float speed = 0.5f;
-	int hunger = 5;
+	int hunger = 0;
     byte[] robotColour = new byte[3];
 
     // Robot Elements
     Area2D robotArea;
     Sprite robotSprite;
+    Globals globals = null;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        globals = (Globals)GetNode("/root/GM");
+
         // Get elements of current instance
         robotArea = GetNode<Area2D>("robotarea");
         robotSprite = GetNode<Sprite>("robotSprite");
@@ -38,10 +41,22 @@ public class robot : KinematicBody2D
         
     // }
 
-    public void _on_Area2D_area_entered(Area2D area)
-    {
+    public void _on_Area2D_area_entered(Area2D area) {
+        GD.Print("AREA ENTERED");
+        GD.Print(area.Name);
+        if(area.Name.Contains("foodroot")) {
+            hunger += 1;
+            globals.foodList.Remove(area);
+            area.QueueFree();
+        }
+    }
+
+    public void _on_robotarea_body_entered(Area2D area) {
+        GD.Print("OBJECT ENTERED");
         if(area.Name == "foodroot") {
             hunger += 1;
+            globals.foodList.Remove(area);
+            area.QueueFree();
         }
     }
 
@@ -51,6 +66,20 @@ public class robot : KinematicBody2D
 
     public void setSpeed(float newSpeed) {
         speed = newSpeed;
+    }
+
+    public float getHunger() {
+        return hunger;
+    }
+
+    public void setHunger(int newHunger) {
+        hunger = newHunger;
+    }
+
+    public void killSelf() {
+        GD.Print("death");
+        globals.robotList.Remove(this);
+        QueueFree();
     }
 
 }
