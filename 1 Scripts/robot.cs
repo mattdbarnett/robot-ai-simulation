@@ -8,11 +8,14 @@ public class robot : KinematicBody2D
     // Robot Characteristics
     float speed = 0.5f;
 	int hunger = 5;
+    int home = 0;
+    bool atHome = false;
     byte[] robotColour = new byte[3];
 
     // Robot Elements
     Area2D robotArea;
     Sprite robotSprite;
+    CollisionShape2D robotCol;
     Globals globals = null;
 
     // Called when the node enters the scene tree for the first time.
@@ -23,6 +26,7 @@ public class robot : KinematicBody2D
         // Get elements of current instance
         robotArea = GetNode<Area2D>("robotarea");
         robotSprite = GetNode<Sprite>("robotSprite");
+        robotCol = GetNode<CollisionShape2D>("robotCol");
 
         // Pick random colour for current Robot
         robotColour[0] = (byte)rnd.Next(0, 255);
@@ -46,14 +50,18 @@ public class robot : KinematicBody2D
             hunger += 1;
             globals.foodList.Remove(area);
             area.QueueFree();
+        } else if(area.Name.Contains("homeroot")) {
+            if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
+                robotCol.SetDeferred("disabled", true);
+                setAtHome(true);
+            }
         }
     }
 
-    public void _on_robotarea_body_entered(Area2D area) {
-        if(area.Name == "foodroot") {
-            hunger += 1;
-            globals.foodList.Remove(area);
-            area.QueueFree();
+    public void _on_robotarea_area_exited(Area2D area)  {
+        if(area.Name.Contains("homeroot")) {
+            robotCol.SetDeferred("disabled", false);
+            setAtHome(false);
         }
     }
 
@@ -71,6 +79,22 @@ public class robot : KinematicBody2D
 
     public void setHunger(int newHunger) {
         hunger = newHunger;
+    }
+
+    public int getHome() {
+        return home;
+    }
+
+    public void setHome(int newHome) {
+        home = newHome;
+    }
+
+    public bool getAtHome() {
+        return atHome;
+    }
+
+    public void setAtHome(bool state) {
+        atHome = state;
     }
 
     public void killSelf() {
