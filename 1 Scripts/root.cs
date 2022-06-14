@@ -92,7 +92,7 @@ public class root : Node2D
 			int home = rnd.Next(0, homeList.Count);
 
 			robot newInstance = (robot)robot.Instance();
-			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble() * 250));
+			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble() * 500));
 			newInstance.setHome(home);
 			globals.robotList.Add(newInstance);
 			AddChild(newInstance);
@@ -141,6 +141,7 @@ public class root : Node2D
 				currentRobot.MoveAndSlide(velocity);
 			}
 		} else {
+			int robotsAtHome = 0;
 			for(int i = 0; i < globals.robotList.Count; i++) {
 				var currentRobot = globals.robotList[i];
 				if(currentRobot.getAtHome() == false) {
@@ -149,7 +150,12 @@ public class root : Node2D
 					currentRobot.LookAt(housePos);
 					Vector2 velocity = direction * currentRobot.getSpeed();
 					currentRobot.MoveAndSlide(velocity);
+				} else {
+					robotsAtHome += 1;
 				}
+			}
+			if(robotsAtHome == globals.robotList.Count) {
+				roundOver = true;
 			}
 		}
 	}
@@ -183,6 +189,14 @@ public class root : Node2D
 
 		for(int x = 0; x < deadRobotList.Count; x++)  {
 			deadRobotList[x].killSelf();
+		}
+	}
+
+	public bool endOfYearCheck() {
+		if((globals.foodList.Count == 0) && (globals.currentMode == "winter")) {
+			return true; //It is the end of the year
+		} else {
+			return false;
 		}
 	}
 }
