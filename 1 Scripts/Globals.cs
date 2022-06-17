@@ -8,15 +8,30 @@ public class Globals : Node
     // private string b = "text";
     public int currentRound;
     public String currentMode;
+    public int homeSum = 3;
 
     public Godot.Collections.Array<Area2D> foodList = new Godot.Collections.Array<Area2D>();
     public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
+    public Godot.Collections.Array<Godot.Collections.Array<robot>> homeResidents = 
+    new Godot.Collections.Array<Godot.Collections.Array<robot>>();
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         currentRound = 1;
         currentMode = "spring";
+
+        for(int i = 0; i < homeSum; i++) {
+            Godot.Collections.Array<robot> homeResidentsArray = 
+            new Godot.Collections.Array<robot>();
+            homeResidents.Add(homeResidentsArray);
+        }
+    }
+
+    public void resetHomeResidents() {
+        for(int i = 0; i < homeSum; i++) {
+            homeResidents[i].Clear();
+        }
     }
 
     public void iterateRound() {

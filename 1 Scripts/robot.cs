@@ -10,7 +10,7 @@ public class robot : KinematicBody2D
 	int hunger = 5;
     int home = 0;
     bool atHome = false;
-    byte[] robotColour = new byte[3];
+    public byte[] robotColour = new byte[3];
 
     // Robot Elements
     Area2D robotArea;
@@ -52,6 +52,7 @@ public class robot : KinematicBody2D
             area.QueueFree();
         } else if(area.Name.Contains("homeroot")) {
             if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
+                globals.homeResidents[getHome()].Add(this);
                 robotCol.SetDeferred("disabled", true);
                 setAtHome(true);
             }
@@ -95,6 +96,10 @@ public class robot : KinematicBody2D
 
     public void setAtHome(bool state) {
         atHome = state;
+    }
+
+    public void setColour(byte[] newColour) {
+        robotColour = newColour;
     }
 
     public void killSelf() {

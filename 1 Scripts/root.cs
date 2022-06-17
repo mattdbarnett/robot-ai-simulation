@@ -105,7 +105,7 @@ public class root : Node2D
 	{
 		home = (PackedScene)ResourceLoader.Load("res://0 Scenes/home.tscn");
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < globals.homeSum; i++) {
 
 			// Create random coordinates for where to spawn current robot
 			Random rnd = new Random();
@@ -116,6 +116,34 @@ public class root : Node2D
 			homeList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
+		}
+	}
+
+	private void createChildren() 
+	{
+		for(int i = 0; i < globals.homeSum; i++) {
+			var currentHomeResidents = globals.homeResidents[i];
+			if(currentHomeResidents.Count >= 2) {
+
+				robot newChild = (robot)robot.Instance();
+
+				float newSpeed;
+				newSpeed = (currentHomeResidents[0].getSpeed() + currentHomeResidents[1].getSpeed()) / 2;
+				// newSpeed = newSpeed * (rnd.Next(-5, 5) / 10);
+
+				byte[] newColour = new byte[3];
+				newColour[0] = (byte)((currentHomeResidents[0].robotColour[0] + currentHomeResidents[1].robotColour[0]) / 2);
+				newColour[1] = (byte)((currentHomeResidents[0].robotColour[1] + currentHomeResidents[1].robotColour[1]) / 2);
+				newColour[2] = (byte)((currentHomeResidents[0].robotColour[2] + currentHomeResidents[1].robotColour[2]) / 2);
+
+				newChild.setHome(i);
+				newChild.setSpeed(newSpeed);
+				newChild.setColour(newColour);
+
+				globals.robotList.Add(newChild);
+				AddChild(newChild);
+				newChild.Position = currentHomeResidents[0].Position;
+			}
 		}
 	}
 
@@ -154,7 +182,11 @@ public class root : Node2D
 					robotsAtHome += 1;
 				}
 			}
+			GD.Print("ROBOTS AT HOME>>>", robotsAtHome.ToString());
+			GD.Print("TOTAL ROBOT SUM>>>", globals.robotList.Count.ToString());
 			if(robotsAtHome == globals.robotList.Count) {
+				createChildren();
+				globals.resetHomeResidents();
 				roundOver = true;
 			}
 		}
