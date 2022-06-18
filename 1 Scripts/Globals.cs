@@ -12,6 +12,7 @@ public class Globals : Node
 
     public Godot.Collections.Array<Area2D> foodList = new Godot.Collections.Array<Area2D>();
     public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
+    public Godot.Collections.Array<Area2D> homeList = new Godot.Collections.Array<Area2D>();
     public Godot.Collections.Array<Godot.Collections.Array<robot>> homeResidents = 
     new Godot.Collections.Array<Godot.Collections.Array<robot>>();
 

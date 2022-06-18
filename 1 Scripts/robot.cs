@@ -27,11 +27,6 @@ public class robot : KinematicBody2D
         robotArea = GetNode<Area2D>("robotarea");
         robotSprite = GetNode<Sprite>("robotSprite");
         robotCol = GetNode<CollisionShape2D>("robotCol");
-
-        // Pick random colour for current Robot
-        robotColour[0] = (byte)rnd.Next(0, 255);
-        robotColour[1] = (byte)rnd.Next(0, 255);
-        robotColour[2] = (byte)rnd.Next(0, 255);
         
         robotSprite.Modulate = Color.Color8(
             robotColour[0],
@@ -52,7 +47,14 @@ public class robot : KinematicBody2D
             area.QueueFree();
         } else if(area.Name.Contains("homeroot")) {
             if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
-                globals.homeResidents[getHome()].Add(this);
+                int homeInside = getHome();
+                for(int id = 0; id < globals.homeList.Count;id++) {
+                    if(globals.homeList[id] == area) {
+                        homeInside = id;
+                    }
+                }
+                globals.homeResidents[homeInside].Add(this);
+                setHome(homeInside);
                 robotCol.SetDeferred("disabled", true);
                 setAtHome(true);
             }
@@ -96,6 +98,12 @@ public class robot : KinematicBody2D
 
     public void setAtHome(bool state) {
         atHome = state;
+    }
+
+    public void randomColour() {
+        robotColour[0] = (byte)rnd.Next(0, 255);
+        robotColour[1] = (byte)rnd.Next(0, 255);
+        robotColour[2] = (byte)rnd.Next(0, 255);
     }
 
     public void setColour(byte[] newColour) {

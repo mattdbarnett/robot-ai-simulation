@@ -15,7 +15,6 @@ public class root : Node2D
 	PackedScene food;
 	PackedScene robot;
 	PackedScene home;
-	public Godot.Collections.Array<Area2D> homeList = new Godot.Collections.Array<Area2D>();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -89,11 +88,12 @@ public class root : Node2D
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
-			int home = rnd.Next(0, homeList.Count);
+			int home = rnd.Next(0, globals.homeList.Count);
 
 			robot newInstance = (robot)robot.Instance();
 			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble() * 500));
 			newInstance.setHome(home);
+			newInstance.randomColour();
 			globals.robotList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
@@ -113,7 +113,7 @@ public class root : Node2D
 			int y = rnd.Next(0, 1080);
 
 			Area2D newInstance = (Area2D)home.Instance();
-			homeList.Add(newInstance);
+			globals.homeList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
 		}
@@ -128,13 +128,16 @@ public class root : Node2D
 				robot newChild = (robot)robot.Instance();
 
 				float newSpeed;
-				newSpeed = (currentHomeResidents[0].getSpeed() + currentHomeResidents[1].getSpeed()) / 2;
-				// newSpeed = newSpeed * (rnd.Next(-5, 5) / 10);
+				newSpeed = ((currentHomeResidents[0].getSpeed() + currentHomeResidents[1].getSpeed()) / 2) + (float)(rnd.Next(-25, 25));
+				//newSpeed = newSpeed * (rnd.Next(-2, 2) / 10);
 
 				byte[] newColour = new byte[3];
-				newColour[0] = (byte)((currentHomeResidents[0].robotColour[0] + currentHomeResidents[1].robotColour[0]) / 2);
-				newColour[1] = (byte)((currentHomeResidents[0].robotColour[1] + currentHomeResidents[1].robotColour[1]) / 2);
-				newColour[2] = (byte)((currentHomeResidents[0].robotColour[2] + currentHomeResidents[1].robotColour[2]) / 2);
+				for(int col = 0; col < 3; col++) {
+					newColour[col] = (byte)
+					(((currentHomeResidents[0].robotColour[col] + 
+					currentHomeResidents[1].robotColour[col]) 
+					/ 2) + rnd.Next(5, 5));
+				}
 
 				newChild.setHome(i);
 				newChild.setSpeed(newSpeed);
@@ -173,7 +176,7 @@ public class root : Node2D
 			for(int i = 0; i < globals.robotList.Count; i++) {
 				var currentRobot = globals.robotList[i];
 				if(currentRobot.getAtHome() == false) {
-					Vector2 housePos = homeList[currentRobot.getHome()].Position;
+					Vector2 housePos = globals.homeList[currentRobot.getHome()].Position;
 					Vector2 direction = currentRobot.Position.DirectionTo(housePos);
 					currentRobot.LookAt(housePos);
 					Vector2 velocity = direction * currentRobot.getSpeed();
@@ -182,8 +185,6 @@ public class root : Node2D
 					robotsAtHome += 1;
 				}
 			}
-			GD.Print("ROBOTS AT HOME>>>", robotsAtHome.ToString());
-			GD.Print("TOTAL ROBOT SUM>>>", globals.robotList.Count.ToString());
 			if(robotsAtHome == globals.robotList.Count) {
 				createChildren();
 				globals.resetHomeResidents();
