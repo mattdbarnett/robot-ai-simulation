@@ -10,6 +10,9 @@ public class root : Node2D
 	Label roundLabel = null;
 	Label seasonLabel = null;
 	Label robotsLabel = null;
+	Label fastestLabel = null;
+	Label mostHLabel = null;
+	Label leastHLabel = null;
 
 	// Instanced elements
 	PackedScene food;
@@ -21,9 +24,14 @@ public class root : Node2D
 	{
 		_EnterTree();
 		globals = (Globals)GetNode("/root/GM");
-		roundLabel = (Label)GetNode("UI/statsPanel/roundLabel");
-		seasonLabel = (Label)GetNode("UI/statsPanel/seasonLabel");
-		robotsLabel = (Label)GetNode("UI/statsPanel/robotsLabel");
+
+		roundLabel = (Label)GetNode("UI/infoPanel/roundLabel");
+		seasonLabel = (Label)GetNode("UI/infoPanel/seasonLabel");
+		robotsLabel = (Label)GetNode("UI/infoPanel/robotsLabel");
+
+		fastestLabel = (Label)GetNode("UI/statsPanel/fastestLabel");
+		mostHLabel = (Label)GetNode("UI/statsPanel/mostHLabel");
+		leastHLabel = (Label)GetNode("UI/statsPanel/leastHLabel");
 		
 		createFood(10);
 		createHomes();
@@ -128,15 +136,16 @@ public class root : Node2D
 				robot newChild = (robot)robot.Instance();
 
 				float newSpeed;
-				newSpeed = ((currentHomeResidents[0].getSpeed() + currentHomeResidents[1].getSpeed()) / 2) + (float)(rnd.Next(-25, 25));
-				//newSpeed = newSpeed * (rnd.Next(-2, 2) / 10);
+				newSpeed = ((currentHomeResidents[0].getSpeed() + 
+				currentHomeResidents[1].getSpeed()) / 2) + 
+				(float)(rnd.Next(-15, 30));
 
 				byte[] newColour = new byte[3];
 				for(int col = 0; col < 3; col++) {
 					newColour[col] = (byte)
 					(((currentHomeResidents[0].robotColour[col] + 
 					currentHomeResidents[1].robotColour[col]) 
-					/ 2) + rnd.Next(5, 5));
+					/ 2) + rnd.Next(15, 15));
 				}
 
 				newChild.setHome(i);
@@ -197,6 +206,26 @@ public class root : Node2D
 		roundLabel.Text = globals.currentRound.ToString();
 		seasonLabel.Text = globals.currentMode.Capitalize();
 		robotsLabel.Text = globals.robotList.Count.ToString();
+
+		if(roundOver == true) {
+			float fastestSpeed = 0;
+			int mostHealth = 0;
+			int leastHealth = 9999;
+			for(int id = 0; id < globals.robotList.Count; id++) {
+				robot currentRobot = globals.robotList[id];
+				if(currentRobot.getSpeed() > fastestSpeed) {
+					fastestSpeed = globals.robotList[id].getSpeed();
+				}
+				if(currentRobot.getHunger() > mostHealth) {
+					mostHealth = currentRobot.getHunger();
+				} else if(currentRobot.getHunger() < leastHealth) {
+					leastHealth = currentRobot.getHunger();
+				}
+			}
+			fastestLabel.Text = fastestSpeed.ToString();
+			mostHLabel.Text = mostHealth.ToString();
+			leastHLabel.Text = leastHealth.ToString();
+		}
 	}
 
 	public void drainHunger() {
