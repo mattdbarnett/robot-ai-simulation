@@ -13,6 +13,7 @@ current = true
 layer = 10
 
 [node name="infoPanel" type="Panel" parent="UI"]
+modulate = Color( 1, 1, 1, 0.470588 )
 margin_left = 1664.0
 margin_right = 1921.0
 margin_bottom = 128.0
@@ -57,6 +58,7 @@ align = 1
 valign = 1
 
 [node name="statsPanel" type="Panel" parent="UI"]
+modulate = Color( 1, 1, 1, 0.470588 )
 margin_left = 1408.0
 margin_right = 1665.0
 margin_bottom = 128.0

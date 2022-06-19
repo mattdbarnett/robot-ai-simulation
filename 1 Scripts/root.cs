@@ -6,6 +6,8 @@ public class root : Node2D
 	Random rnd = new Random();
 	Globals globals = null;
 	bool roundOver = false;
+	Godot.Collections.Array<Godot.Vector2> homePosList = 
+	new Godot.Collections.Array<Godot.Vector2>();
 
 	Label roundLabel = null;
 	Label seasonLabel = null;
@@ -36,6 +38,7 @@ public class root : Node2D
 		createFood(10);
 		createHomes();
 		createRobots();
+		activateHomes(false);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -52,6 +55,7 @@ public class root : Node2D
 		if(roundOver == true) {
 			deathCheck();
 			drainHunger();
+			GetTree().CallGroup("ROBOTS", "enableCol");
 			globals.iterateRound();
 			if(globals.currentMode == "winter") {
 				createFood(3);
@@ -99,9 +103,12 @@ public class root : Node2D
 			int home = rnd.Next(0, globals.homeList.Count);
 
 			robot newInstance = (robot)robot.Instance();
+
 			newInstance.setSpeed(Convert.ToSingle(rnd.NextDouble() * 500));
 			newInstance.setHome(home);
 			newInstance.randomColour();
+
+			newInstance.AddToGroup("ROBOTS");
 			globals.robotList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
@@ -120,10 +127,13 @@ public class root : Node2D
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
 
-			Area2D newInstance = (Area2D)home.Instance();
+			home newInstance = (home)home.Instance();
 			globals.homeList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
+			homePosList.Add(newInstance.Position);
+			GD.Print(homePosList.ToString());
+			GD.Print(newInstance.Position.ToString());
 		}
 	}
 
@@ -152,6 +162,7 @@ public class root : Node2D
 				newChild.setSpeed(newSpeed);
 				newChild.setColour(newColour);
 
+				newChild.AddToGroup("ROBOTS");
 				globals.robotList.Add(newChild);
 				AddChild(newChild);
 				newChild.Position = currentHomeResidents[0].Position;
@@ -181,22 +192,26 @@ public class root : Node2D
 				currentRobot.MoveAndSlide(velocity);
 			}
 		} else {
-			int robotsAtHome = 0;
+			activateHomes(true);
+			//GD.Print("ROBOTS AT HOME>>>", robotsAtHome.ToString());
+			//GD.Print("TOTAL ROBOT SUM>>>", globals.robotList.Count.ToString());
 			for(int i = 0; i < globals.robotList.Count; i++) {
 				var currentRobot = globals.robotList[i];
-				if(currentRobot.getAtHome() == false) {
-					Vector2 housePos = globals.homeList[currentRobot.getHome()].Position;
+				if(!currentRobot.getAtHome()) {
+					Vector2 housePos = homePosList[currentRobot.getHome()];
 					Vector2 direction = currentRobot.Position.DirectionTo(housePos);
 					currentRobot.LookAt(housePos);
 					Vector2 velocity = direction * currentRobot.getSpeed();
 					currentRobot.MoveAndSlide(velocity);
-				} else {
-					robotsAtHome += 1;
 				}
 			}
-			if(robotsAtHome == globals.robotList.Count) {
+			GD.Print("total robots alive!", GetTree().GetNodesInGroup("ROBOTS").Count.ToString());
+			GD.Print("robot at home!", globals.homeRobots.Count.ToString());
+			if(globals.homeRobots.Count == globals.robotList.Count) {
 				createChildren();
+				activateHomes(false);
 				globals.resetHomeResidents();
+				globals.homeRobots.Clear();
 				roundOver = true;
 			}
 		}
@@ -254,11 +269,10 @@ public class root : Node2D
 		}
 	}
 
-	public bool endOfYearCheck() {
-		if((globals.foodList.Count == 0) && (globals.currentMode == "winter")) {
-			return true; //It is the end of the year
-		} else {
-			return false;
+	public void activateHomes(bool activate) {
+		for(int id = 0; id < globals.homeList.Count; id++) {
+			globals.homeList[id].setMonitoring(activate);
 		}
 	}
+
 }
