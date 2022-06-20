@@ -3,9 +3,6 @@ using System;
 
 public class Globals : Node
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
     public int currentRound;
     public String currentMode;
     public int homeSum = 3;
@@ -54,10 +51,4 @@ public class Globals : Node
                 break;
         }
     }
-
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
 }

@@ -34,52 +34,12 @@ public class robot : KinematicBody2D
             robotColour[2]);
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    // public override void _Process(float delta)
-    // {
-        
-    // }
-
     public void _on_Area2D_area_entered(Area2D area) {
         if(area.Name.Contains("foodroot")) {
             hunger += 1;
             globals.foodList.Remove(area);
             area.QueueFree();
         }
-        // } else if (area.Name.Contains("colarea")) {
-        //     if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
-        //         robotCol.SetDeferred("disabled", true);
-        //     }
-        // } else if(area.Name.Contains("homeroot")) {
-        //     if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
-        //         int homeInside = getHome();
-        //         for(int id = 0; id < globals.homeList.Count;id++) {
-        //             if(globals.homeList[id] == area) {
-        //                 homeInside = id;
-        //             }
-        //         }
-        //         globals.homeResidents[homeInside].Add(this);
-        //         setHome(homeInside);
-        //         setAtHome(true);
-        //     }
-        
-        // if(area.Name.Contains("colarea")) {
-        //     if((globals.currentMode == "winter") && (globals.foodList.Count == 0)) {
-        //         robotCol.SetDeferred("disabled", true);
-        //     }
-        // }
-    }
-
-    public void _on_robotarea_area_exited(Area2D area)  {
-        // if(area.Name.Contains("colarea")) {
-        //     robotCol.SetDeferred("disabled", false);
-        // } else if(area.Name.Contains("homeroot")) {
-        //     setAtHome(false);
-        // }
-    }
-    
-    public void enableCol() {
-        robotCol.SetDeferred("disabled", false);
     }
 
     public float getSpeed() {

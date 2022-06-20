@@ -55,15 +55,26 @@ public class root : Node2D
 		if(roundOver == true) {
 			deathCheck();
 			drainHunger();
-			GetTree().CallGroup("ROBOTS", "enableCol");
 			globals.iterateRound();
-			if(globals.currentMode == "winter") {
-				createFood(3);
-				roundOver = false;
-			} else {
-				createFood(10);
-				roundOver = false;
-			}
+			switch(globals.currentMode) {
+				case "winter":
+					createFood(3);
+					roundOver = false;
+					break;
+				case "spring":
+					createFood(10);
+					roundOver = false;
+					break;
+				case "summer":
+					activateHomes(false);
+					createFood(10);
+					roundOver = false;
+					break;
+				case "autumn":
+					createFood(10);
+					roundOver = false;
+					break;
+			}	
 		}
 
 		if(Input.IsActionJustPressed("ui_right")) {
@@ -82,7 +93,7 @@ public class root : Node2D
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
 
-			food newInstance = (food)food.Instance();
+			Area2D newInstance = (Area2D)food.Instance();
 			globals.foodList.Add(newInstance);
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
@@ -121,7 +132,6 @@ public class root : Node2D
 		home = (PackedScene)ResourceLoader.Load("res://0 Scenes/home.tscn");
 
 		for (int i = 0; i < globals.homeSum; i++) {
-
 			// Create random coordinates for where to spawn current robot
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
@@ -132,8 +142,6 @@ public class root : Node2D
 			AddChild(newInstance);
 			newInstance.Position = new Vector2(x, y);
 			homePosList.Add(newInstance.Position);
-			GD.Print(homePosList.ToString());
-			GD.Print(newInstance.Position.ToString());
 		}
 	}
 
@@ -170,6 +178,7 @@ public class root : Node2D
 		}
 	}
 
+
 	public void controlRobots()
 	{	
 		// Find closest food, look at it and move towards it
@@ -193,8 +202,6 @@ public class root : Node2D
 			}
 		} else {
 			activateHomes(true);
-			//GD.Print("ROBOTS AT HOME>>>", robotsAtHome.ToString());
-			//GD.Print("TOTAL ROBOT SUM>>>", globals.robotList.Count.ToString());
 			for(int i = 0; i < globals.robotList.Count; i++) {
 				var currentRobot = globals.robotList[i];
 				if(!currentRobot.getAtHome()) {
@@ -205,11 +212,8 @@ public class root : Node2D
 					currentRobot.MoveAndSlide(velocity);
 				}
 			}
-			GD.Print("total robots alive!", GetTree().GetNodesInGroup("ROBOTS").Count.ToString());
-			GD.Print("robot at home!", globals.homeRobots.Count.ToString());
 			if(globals.homeRobots.Count == globals.robotList.Count) {
 				createChildren();
-				activateHomes(false);
 				globals.resetHomeResidents();
 				globals.homeRobots.Clear();
 				roundOver = true;
