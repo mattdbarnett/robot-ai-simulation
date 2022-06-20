@@ -27,13 +27,13 @@ public class root : Node2D
 		_EnterTree();
 		globals = (Globals)GetNode("/root/GM");
 
-		roundLabel = (Label)GetNode("UI/infoPanel/roundLabel");
-		seasonLabel = (Label)GetNode("UI/infoPanel/seasonLabel");
-		robotsLabel = (Label)GetNode("UI/infoPanel/robotsLabel");
+		roundLabel = (Label)GetNode("UI/roundStats/infoPanel/roundValue");
+		seasonLabel = (Label)GetNode("UI/roundStats/infoPanel/seasonValue");
+		robotsLabel = (Label)GetNode("UI/roundStats/infoPanel/robotsValue");
 
-		fastestLabel = (Label)GetNode("UI/statsPanel/fastestLabel");
-		mostHLabel = (Label)GetNode("UI/statsPanel/mostHLabel");
-		leastHLabel = (Label)GetNode("UI/statsPanel/leastHLabel");
+		fastestLabel = (Label)GetNode("UI/robotStats/infoPanel/fastestValue");
+		mostHLabel = (Label)GetNode("UI/robotStats/infoPanel/mostHValue");
+		leastHLabel = (Label)GetNode("UI/robotStats/infoPanel/leastHValue");
 		
 		createFood(10);
 		createHomes();

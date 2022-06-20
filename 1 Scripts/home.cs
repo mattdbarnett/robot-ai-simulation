@@ -32,7 +32,6 @@ public class home : Area2D
             robot obj = (robot)area.GetParent();
             if(obj.Name.Contains("robotroot") &&
             (globals.currentMode != "winter")) {
-                GD.Print("Body exit AREA");
                 var objcol = obj.GetNode("robotCol");
                 objcol.SetDeferred("disabled", false);
             }

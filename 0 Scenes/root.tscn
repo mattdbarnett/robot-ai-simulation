@@ -1,6 +1,23 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://1 Scripts/root.cs" type="Script" id=1]
+[ext_resource path="res://2 Sprites/background.png" type="Texture" id=2]
+[ext_resource path="res://2 Sprites/panel.png" type="Texture" id=3]
+[ext_resource path="res://3 Styling/main_theme.tres" type="Theme" id=4]
+[ext_resource path="res://3 Styling/fnt_18b.tres" type="DynamicFont" id=5]
+[ext_resource path="res://2 Sprites/close.png" type="Texture" id=6]
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 3 )
+region_rect = Rect2( 0, 0, 128, 64 )
+
+[sub_resource type="StyleBoxTexture" id=3]
+texture = ExtResource( 6 )
+region_rect = Rect2( 0, 0, 32, 16 )
+
+[sub_resource type="StyleBoxTexture" id=2]
+texture = ExtResource( 3 )
+region_rect = Rect2( 0, 0, 128, 64 )
 
 [node name="root" type="Node2D"]
 script = ExtResource( 1 )
@@ -12,92 +29,167 @@ current = true
 [node name="UI" type="CanvasLayer" parent="."]
 layer = 10
 
-[node name="infoPanel" type="Panel" parent="UI"]
-modulate = Color( 1, 1, 1, 0.470588 )
+[node name="roundStats" type="Control" parent="UI"]
+modulate = Color( 1, 1, 1, 0.784314 )
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="infoPanel" type="Panel" parent="UI/roundStats"]
 margin_left = 1664.0
-margin_right = 1921.0
-margin_bottom = 128.0
+margin_right = 1920.0
+margin_bottom = 130.0
+theme = ExtResource( 4 )
+custom_styles/panel = SubResource( 1 )
 
-[node name="Label" type="Label" parent="UI/infoPanel"]
+[node name="roundLabel" type="Label" parent="UI/roundStats/infoPanel"]
+margin_left = 20.0
+margin_top = 22.0
 margin_right = 128.0
-margin_bottom = 128.0
-text = "Round:
-
-Season:
-
-Robots:"
+margin_bottom = 45.0
+rect_pivot_offset = Vector2( -512, 0 )
+custom_fonts/font = ExtResource( 5 )
+text = "Round:"
 align = 1
 valign = 1
 
-[node name="roundLabel" type="Label" parent="UI/infoPanel"]
+[node name="roundValue" type="Label" parent="UI/roundStats/infoPanel"]
 margin_left = 128.0
-margin_top = 16.0
+margin_top = 22.0
 margin_right = 256.0
-margin_bottom = 40.0
+margin_bottom = 45.0
 rect_pivot_offset = Vector2( -512, 0 )
 text = "N/A"
 align = 1
 valign = 1
 
-[node name="seasonLabel" type="Label" parent="UI/infoPanel"]
+[node name="seasonLabel" type="Label" parent="UI/roundStats/infoPanel"]
+margin_left = 20.0
+margin_top = 54.0
+margin_right = 128.0
+margin_bottom = 77.0
+custom_fonts/font = ExtResource( 5 )
+text = "Season:"
+align = 1
+valign = 1
+
+[node name="seasonValue" type="Label" parent="UI/roundStats/infoPanel"]
 margin_left = 128.0
-margin_top = 48.0
+margin_top = 54.0
 margin_right = 256.0
-margin_bottom = 80.0
+margin_bottom = 77.0
 text = "N/A"
 align = 1
 valign = 1
 
-[node name="robotsLabel" type="Label" parent="UI/infoPanel"]
+[node name="robotsLabel" type="Label" parent="UI/roundStats/infoPanel"]
+margin_left = 20.0
+margin_top = 86.0
+margin_right = 128.0
+margin_bottom = 109.0
+custom_fonts/font = ExtResource( 5 )
+text = "Robots:"
+align = 1
+valign = 1
+
+[node name="robotsValue" type="Label" parent="UI/roundStats/infoPanel"]
 margin_left = 128.0
-margin_top = 88.0
+margin_top = 86.0
 margin_right = 256.0
-margin_bottom = 112.0
+margin_bottom = 109.0
 text = "N/A"
 align = 1
 valign = 1
 
-[node name="statsPanel" type="Panel" parent="UI"]
-modulate = Color( 1, 1, 1, 0.470588 )
+[node name="closeButton" type="Button" parent="UI/roundStats"]
+margin_left = 1856.0
+margin_top = 130.0
+margin_right = 1920.0
+margin_bottom = 160.0
+theme = ExtResource( 4 )
+custom_styles/normal = SubResource( 3 )
+
+[node name="robotStats" type="Control" parent="UI"]
+modulate = Color( 1, 1, 1, 0.784314 )
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="infoPanel" type="Panel" parent="UI/robotStats"]
 margin_left = 1408.0
-margin_right = 1665.0
-margin_bottom = 128.0
+margin_right = 1664.0
+margin_bottom = 130.0
+rect_pivot_offset = Vector2( 314, 132 )
+theme = ExtResource( 4 )
+custom_styles/panel = SubResource( 2 )
 
-[node name="Label" type="Label" parent="UI/statsPanel"]
+[node name="fastestLabel" type="Label" parent="UI/robotStats/infoPanel"]
+margin_left = 20.0
+margin_top = 22.0
 margin_right = 128.0
-margin_bottom = 128.0
-text = "Fastest:
-
-Most Health:
-
-Least Health:"
+margin_bottom = 45.0
+rect_pivot_offset = Vector2( -512, 0 )
+custom_fonts/font = ExtResource( 5 )
+text = "Fastest:"
 align = 1
 valign = 1
 
-[node name="fastestLabel" type="Label" parent="UI/statsPanel"]
+[node name="fastestValue" type="Label" parent="UI/robotStats/infoPanel"]
 margin_left = 128.0
-margin_top = 16.0
+margin_top = 22.0
 margin_right = 256.0
-margin_bottom = 40.0
+margin_bottom = 45.0
 rect_pivot_offset = Vector2( -512, 0 )
 text = "N/A"
 align = 1
 valign = 1
 
-[node name="mostHLabel" type="Label" parent="UI/statsPanel"]
+[node name="mostHLabel" type="Label" parent="UI/robotStats/infoPanel"]
+margin_left = 20.0
+margin_top = 54.0
+margin_right = 128.0
+margin_bottom = 77.0
+custom_fonts/font = ExtResource( 5 )
+text = "Most HP:"
+align = 1
+valign = 1
+
+[node name="mostHValue" type="Label" parent="UI/robotStats/infoPanel"]
 margin_left = 128.0
-margin_top = 48.0
+margin_top = 54.0
 margin_right = 256.0
-margin_bottom = 80.0
+margin_bottom = 77.0
 text = "N/A"
 align = 1
 valign = 1
 
-[node name="leastHLabel" type="Label" parent="UI/statsPanel"]
+[node name="leastHLabel" type="Label" parent="UI/robotStats/infoPanel"]
+margin_left = 20.0
+margin_top = 86.0
+margin_right = 128.0
+margin_bottom = 109.0
+custom_fonts/font = ExtResource( 5 )
+text = "Least HP:"
+align = 1
+valign = 1
+
+[node name="leastHValue" type="Label" parent="UI/robotStats/infoPanel"]
 margin_left = 128.0
-margin_top = 88.0
+margin_top = 86.0
 margin_right = 256.0
-margin_bottom = 112.0
+margin_bottom = 109.0
 text = "N/A"
 align = 1
 valign = 1
+
+[node name="closeButton" type="Button" parent="UI/robotStats"]
+margin_left = 1600.0
+margin_top = 130.0
+margin_right = 1664.0
+margin_bottom = 160.0
+theme = ExtResource( 4 )
+custom_styles/normal = SubResource( 3 )
+
+[node name="Sprite" type="Sprite" parent="."]
+modulate = Color( 1, 1, 1, 0.294118 )
+position = Vector2( 960, 539.5 )
+scale = Vector2( 2, 1.99815 )
+texture = ExtResource( 2 )
