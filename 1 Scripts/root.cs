@@ -1,11 +1,13 @@
 using Godot;
 using System;
+using System.Linq;
 
 public class root : Node2D
 {
 	Random rnd = new Random();
 	Globals globals = null;
 	bool roundOver = false;
+	int countdownValue = 25;
 	Godot.Collections.Array<Godot.Vector2> homePosList = 
 	new Godot.Collections.Array<Godot.Vector2>();
 
@@ -15,6 +17,8 @@ public class root : Node2D
 	Label fastestLabel = null;
 	Label mostHLabel = null;
 	Label leastHLabel = null;
+	Label countdownLabel = null;
+	Timer countdownTimer = null;
 
 	// Instanced elements
 	PackedScene food;
@@ -35,6 +39,9 @@ public class root : Node2D
 		mostHLabel = (Label)GetNode("UI/robotStats/infoPanel/mostHValue");
 		leastHLabel = (Label)GetNode("UI/robotStats/infoPanel/leastHValue");
 		
+		countdownLabel = (Label)GetNode("UI/countdownStats/countdownPanel/countdownLabel");
+		countdownTimer = (Timer)GetNode("UI/countdownStats/countdownTimer");
+		
 		createFood(10);
 		createHomes();
 		createRobots();
@@ -52,9 +59,24 @@ public class root : Node2D
 			roundOver = true;
 		}
 
+		if(countdownValue <= 0) {
+			for(int id = 0; id < globals.robotList.Count; id++) {
+				if(!globals.robotList[id].getAtHome()) {
+					globals.robotList[id].setHunger(-10);
+				}
+			}
+			roundOver = true;
+		}
+
 		if(roundOver == true) {
+			countdownValue = 25;
 			deathCheck();
 			drainHunger();
+			if(globals.currentMode == "winter") {
+				createChildren();
+				globals.homeRobots.Clear();
+				globals.resetHomeResidents();
+			}
 			globals.iterateRound();
 			switch(globals.currentMode) {
 				case "winter":
@@ -213,9 +235,6 @@ public class root : Node2D
 				}
 			}
 			if(globals.homeRobots.Count == globals.robotList.Count) {
-				createChildren();
-				globals.resetHomeResidents();
-				globals.homeRobots.Clear();
 				roundOver = true;
 			}
 		}
@@ -225,6 +244,7 @@ public class root : Node2D
 		roundLabel.Text = globals.currentRound.ToString();
 		seasonLabel.Text = globals.currentMode.Capitalize();
 		robotsLabel.Text = globals.robotList.Count.ToString();
+		countdownLabel.Text = countdownValue.ToString();
 
 		if(roundOver == true) {
 			float fastestSpeed = 0;
@@ -245,6 +265,25 @@ public class root : Node2D
 			mostHLabel.Text = mostHealth.ToString();
 			leastHLabel.Text = leastHealth.ToString();
 		}
+
+		if(countdownValue > 15) {
+			countdownLabel.Modulate = Color.Color8(255, 255, 255);
+		} else if(countdownValue > 5) {
+			countdownLabel.Modulate = Color.Color8(255, 255, 94);
+		} else {
+			countdownLabel.Modulate = Color.Color8(255, 38, 38);
+		}
+		// if(Enumerable.Range(25, 16).Contains(countdownValue)) {
+		// 	countdownLabel.Modulate = Color.Color8(255, 255, 255);
+		// } else if(Enumerable.Range(15, 6).Contains(countdownValue)) {
+		// 	countdownLabel.Modulate = Color.Color8(255, 255, 94);
+		// } else if(Enumerable.Range(5, 0).Contains(countdownValue)) {
+		// 	countdownLabel.Modulate = Color.Color8(255, 38, 38);
+		// }
+	}
+	
+	public void _on_countdownTimer_timeout() {
+		countdownValue -= 1;
 	}
 
 	public void drainHunger() {
