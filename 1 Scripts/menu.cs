@@ -21,9 +21,10 @@ public class menu : Control
 
 
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+public override void _Input(InputEvent inputEvent) {
+    if (inputEvent.IsActionPressed("exit")) {
+        GetTree().Quit();
+    }
+}
+
 }

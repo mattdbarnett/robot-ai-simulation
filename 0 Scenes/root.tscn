@@ -5,17 +5,14 @@
 [ext_resource path="res://2 Sprites/panel.png" type="Texture" id=3]
 [ext_resource path="res://3 Styling/main_theme.tres" type="Theme" id=4]
 [ext_resource path="res://3 Styling/fnt_18b.tres" type="DynamicFont" id=5]
-[ext_resource path="res://2 Sprites/close.png" type="Texture" id=6]
+[ext_resource path="res://3 Styling/panelCloseBtnTheme.tres" type="StyleBox" id=6]
 [ext_resource path="res://3 Styling/fnt_96b.tres" type="DynamicFont" id=7]
 [ext_resource path="res://2 Sprites/panelcountdown.png" type="Texture" id=8]
+[ext_resource path="res://3 Styling/panelCloseInvertBtnTheme.tres" type="StyleBox" id=9]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 3 )
 region_rect = Rect2( 0, 0, 128, 64 )
-
-[sub_resource type="StyleBoxTexture" id=3]
-texture = ExtResource( 6 )
-region_rect = Rect2( 0, 0, 32, 16 )
 
 [sub_resource type="StyleBoxEmpty" id=6]
 
@@ -114,17 +111,17 @@ text = "N/A"
 align = 1
 valign = 1
 
-[node name="closeButton" type="Button" parent="UI/roundStats"]
+[node name="closeRoundButton" type="Button" parent="UI/roundStats"]
 margin_left = 1856.0
 margin_top = 130.0
 margin_right = 1920.0
 margin_bottom = 160.0
 theme = ExtResource( 4 )
-custom_styles/hover = SubResource( 3 )
-custom_styles/pressed = SubResource( 3 )
+custom_styles/hover = ExtResource( 6 )
+custom_styles/pressed = ExtResource( 9 )
 custom_styles/focus = SubResource( 6 )
 custom_styles/disabled = SubResource( 7 )
-custom_styles/normal = SubResource( 3 )
+custom_styles/normal = ExtResource( 6 )
 
 [node name="robotStats" type="Control" parent="UI"]
 modulate = Color( 1, 1, 1, 0.784314 )
@@ -198,17 +195,17 @@ text = "N/A"
 align = 1
 valign = 1
 
-[node name="closeButton" type="Button" parent="UI/robotStats"]
+[node name="closeRobotButton" type="Button" parent="UI/robotStats"]
 margin_left = 1600.0
 margin_top = 130.0
 margin_right = 1664.0
 margin_bottom = 160.0
 theme = ExtResource( 4 )
-custom_styles/hover = SubResource( 3 )
-custom_styles/pressed = SubResource( 3 )
+custom_styles/hover = ExtResource( 6 )
+custom_styles/pressed = ExtResource( 9 )
 custom_styles/focus = SubResource( 10 )
 custom_styles/disabled = SubResource( 11 )
-custom_styles/normal = SubResource( 3 )
+custom_styles/normal = ExtResource( 6 )
 
 [node name="countdownStats" type="Control" parent="UI"]
 modulate = Color( 1, 1, 1, 0.784314 )
@@ -238,5 +235,10 @@ modulate = Color( 1, 1, 1, 0.294118 )
 position = Vector2( 960, 539.5 )
 scale = Vector2( 2, 1.99815 )
 texture = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
 
+[connection signal="pressed" from="UI/roundStats/closeRoundButton" to="." method="_on_closeRoundButton_pressed"]
+[connection signal="pressed" from="UI/robotStats/closeRobotButton" to="." method="_on_closeRobotButton_pressed"]
 [connection signal="timeout" from="UI/countdownStats/countdownTimer" to="." method="_on_countdownTimer_timeout"]
