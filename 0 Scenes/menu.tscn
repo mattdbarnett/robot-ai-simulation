@@ -1,0 +1,102 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://2 Sprites/background.png" type="Texture" id=1]
+[ext_resource path="res://3 Styling/fnt_44.tres" type="DynamicFont" id=2]
+[ext_resource path="res://3 Styling/fnt_96b.tres" type="DynamicFont" id=3]
+[ext_resource path="res://3 Styling/main_theme.tres" type="Theme" id=4]
+[ext_resource path="res://2 Sprites/startbtn.png" type="Texture" id=5]
+[ext_resource path="res://2 Sprites/panelcountdown.png" type="Texture" id=6]
+[ext_resource path="res://1 Scripts/menu.cs" type="Script" id=7]
+[ext_resource path="res://2 Sprites/startbtninvert.png" type="Texture" id=8]
+[ext_resource path="res://2 Sprites/panelcountdowninvert.png" type="Texture" id=9]
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 5 )
+region_rect = Rect2( 0, 0, 316, 124 )
+
+[sub_resource type="StyleBoxTexture" id=3]
+texture = ExtResource( 8 )
+region_rect = Rect2( 0, 0, 316, 124 )
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="StyleBoxTexture" id=2]
+texture = ExtResource( 6 )
+region_rect = Rect2( 0, 0, 96, 96 )
+
+[sub_resource type="StyleBoxTexture" id=7]
+texture = ExtResource( 9 )
+region_rect = Rect2( 0, 0, 96, 96 )
+
+[sub_resource type="StyleBoxEmpty" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=9]
+
+[node name="menuroot" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 218, -40 )
+theme = ExtResource( 4 )
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="background" type="Sprite" parent="."]
+modulate = Color( 1, 1, 1, 0.294118 )
+position = Vector2( 960, 539.5 )
+scale = Vector2( 2, 1.99815 )
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="menumain" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="btnstart" type="Button" parent="menumain"]
+modulate = Color( 1, 1, 1, 0.784314 )
+margin_left = 808.0
+margin_top = 511.0
+margin_right = 1117.0
+margin_bottom = 639.0
+custom_fonts/font = ExtResource( 2 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 3 )
+custom_styles/focus = SubResource( 5 )
+custom_styles/disabled = SubResource( 6 )
+custom_styles/normal = SubResource( 1 )
+text = "Start"
+
+[node name="btnhelp" type="Button" parent="menumain"]
+modulate = Color( 1, 1, 1, 0.784314 )
+margin_left = 890.0
+margin_top = 693.0
+margin_right = 1034.0
+margin_bottom = 842.0
+custom_fonts/font = ExtResource( 2 )
+custom_styles/hover = SubResource( 2 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 2 )
+text = "?"
+
+[node name="Label" type="Label" parent="menumain"]
+margin_left = 736.0
+margin_top = 226.0
+margin_right = 1184.0
+margin_bottom = 416.0
+custom_fonts/font = ExtResource( 3 )
+text = "Robot.AI"
+align = 1
+valign = 1
+
+[connection signal="pressed" from="menumain/btnstart" to="." method="_on_btnstart_pressed"]
+[connection signal="pressed" from="menumain/btnhelp" to="." method="_on_btnhelp_pressed"]

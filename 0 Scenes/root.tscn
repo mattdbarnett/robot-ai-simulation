@@ -7,7 +7,7 @@
 [ext_resource path="res://3 Styling/fnt_18b.tres" type="DynamicFont" id=5]
 [ext_resource path="res://2 Sprites/close.png" type="Texture" id=6]
 [ext_resource path="res://3 Styling/fnt_96b.tres" type="DynamicFont" id=7]
-[ext_resource path="res://2 Sprites/panel-countdown.png" type="Texture" id=8]
+[ext_resource path="res://2 Sprites/panelcountdown.png" type="Texture" id=8]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 3 )
@@ -233,7 +233,7 @@ text = "25"
 align = 1
 valign = 1
 
-[node name="Sprite" type="Sprite" parent="."]
+[node name="background" type="Sprite" parent="."]
 modulate = Color( 1, 1, 1, 0.294118 )
 position = Vector2( 960, 539.5 )
 scale = Vector2( 2, 1.99815 )
