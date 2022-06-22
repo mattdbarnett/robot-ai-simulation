@@ -65,6 +65,7 @@ public class root : Node2D
     {
         _EnterTree();
         globals = (Globals)GetNode("/root/GM");
+        globals.initGlobals();
 
         roundLabel = (Label)GetNode("UI/roundStats/infoPanel/roundValue");
         seasonLabel = (Label)GetNode("UI/roundStats/infoPanel/seasonValue");
