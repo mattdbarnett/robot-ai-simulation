@@ -1,9 +1,19 @@
+/*
+- - - - - - - - - - - - - - -
+ Title: Root Script
+ Author: Matt Barnett
+ Created: 6/06/2022
+ Last Modified: 21/06/2022
+- - - - - - - - - - - - - - -
+*/
+
 using Godot;
 using System;
-using System.Linq;
 
 public class root : Node2D
 {
+
+	// Simulation Vars
 	Random rnd = new Random();
 	Globals globals = null;
 	bool roundOver = false;
@@ -11,6 +21,7 @@ public class root : Node2D
 	Godot.Collections.Array<Godot.Vector2> homePosList = 
 	new Godot.Collections.Array<Godot.Vector2>();
 
+	// Simulation UI Nodes
 	Label roundLabel = null;
 	Label seasonLabel = null;
 	Label robotsLabel = null;
@@ -24,6 +35,7 @@ public class root : Node2D
 	Button robotStatsBtn = null;
 	Panel robotStatsPanel = null;
 
+	// Sitmulation UI Vars
 	bool roundStatsOpen = true;
 	Vector2 roundStatsOpenPos = new Vector2(1856, 130);
 	Vector2 roundStatsClosedPos = new Vector2(1856, 0);
@@ -35,11 +47,12 @@ public class root : Node2D
 	StyleBox closeStyle = (StyleBox)GD.Load("res://3 Styling/panelCloseBtnTheme.tres");
 	StyleBox closeInvertStyle = (StyleBox)GD.Load("res://3 Styling/panelCloseInvertBtnTheme.tres");
 
-	// Instanced elements
+	// Instanced simulation scenes
 	PackedScene food;
 	PackedScene robot;
 	PackedScene home;
 	
+	// -- Ready Func
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		_EnterTree();
@@ -67,6 +80,8 @@ public class root : Node2D
 		activateHomes(false);
 	}
 
+	// -- Input Func
+	// Called whenever user input is made.
 	public override void _Input(InputEvent inputEvent) {
 
     	if(Input.IsActionJustReleased("exit")) {
@@ -74,8 +89,16 @@ public class root : Node2D
 			GetTree().ChangeScene("res://0 Scenes/menu.tscn");
 		}
 
+		if(Input.IsActionJustReleased("restart")) {
+			globals.initGlobals();
+			GetTree().ReloadCurrentScene();
+			roundOver = false;
 	}
 
+
+	}
+
+	// -- Process Func
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _PhysicsProcess(float delta) {
 
@@ -96,15 +119,22 @@ public class root : Node2D
 		}
 
 		if(roundOver == true) {
+
+			// End of season functions
+			switch(globals.currentMode) {
+				case "winter":
+					createChildren();
+					globals.homeRobots.Clear();
+					globals.initHomeResidents();
+					break;
+			}
+
 			countdownValue = 25;
 			deathCheck();
 			drainHunger();
-			if(globals.currentMode == "winter") {
-				createChildren();
-				globals.homeRobots.Clear();
-				globals.resetHomeResidents();
-			}
 			globals.iterateRound();
+
+			// Start of season functions
 			switch(globals.currentMode) {
 				case "winter":
 					createFood(3);
@@ -126,10 +156,12 @@ public class root : Node2D
 			}	
 		}
 	}
-	
-	private void createFood(int sum)
-	{
+
+	// -- Simulation Init Funcs
+	// Populates simulation with randomly placed food.
+	private void createFood(int sum) {
 		food = (PackedScene)ResourceLoader.Load("res://0 Scenes/food.tscn");
+		globals.foodList.Clear();
 
 		for (int i = 0; i < sum; i++) {
 
@@ -146,8 +178,8 @@ public class root : Node2D
 
 	}
 
-	private void createRobots()
-	{
+	// Creates the first inital set of simulation robots.
+	private void createRobots() {
 		robot = (PackedScene)ResourceLoader.Load("res://0 Scenes/robot.tscn");
 
 		for (int i = 0; i < 25; i++) {
@@ -156,7 +188,7 @@ public class root : Node2D
 			Random rnd = new Random();
 			int x = rnd.Next(0, 1920);
 			int y = rnd.Next(0, 1080);
-			int home = rnd.Next(0, globals.homeList.Count);
+			int home = rnd.Next(0, 2);
 
 			robot newInstance = (robot)robot.Instance();
 
@@ -172,10 +204,10 @@ public class root : Node2D
 
 	}
 
-	private void createHomes()
-	{
+	// Creates the homes that robots enter during winter
+	private void createHomes() {
 		home = (PackedScene)ResourceLoader.Load("res://0 Scenes/home.tscn");
-
+		
 		for (int i = 0; i < globals.homeSum; i++) {
 			// Create random coordinates for where to spawn current robot
 			Random rnd = new Random();
@@ -190,8 +222,56 @@ public class root : Node2D
 		}
 	}
 
-	private void createChildren() 
-	{
+
+	// -- Simulation Maintainence Funcs
+	// Controls all robot activity and movement.
+	public void controlRobots() {	
+		// Find closest food, look at it and move towards it
+		if((globals.foodList.Count > 0) | (globals.currentMode != "winter")) {
+			for(int i = 0; i < globals.robotList.Count; i++) {
+				var currentRobot = globals.robotList[i];
+				if(currentRobot != null) {
+					float closestDistance = 999999;
+					Vector2 closestFood = new Vector2(0, 0);
+					for(int y = 0; y < globals.foodList.Count; y++) {
+						var currentFood = globals.foodList[y];
+						if(currentFood == null) {
+							globals.foodList.Remove(currentFood);
+						} else {
+							float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
+							if(currentDistance < closestDistance) {
+								closestDistance = currentDistance;
+								closestFood = currentFood.Position;
+							}
+						}
+						
+					}
+					Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
+					currentRobot.LookAt(closestFood);
+					Vector2 velocity = direction * currentRobot.getSpeed();
+					currentRobot.MoveAndSlide(velocity);
+				}
+			}
+		} else {
+			activateHomes(true);
+			for(int i = 0; i < globals.robotList.Count; i++) {
+				var currentRobot = globals.robotList[i];
+				if(!currentRobot.getAtHome()) {
+					Vector2 housePos = homePosList[currentRobot.getHome()];
+					Vector2 direction = currentRobot.Position.DirectionTo(housePos);
+					currentRobot.LookAt(housePos);
+					Vector2 velocity = direction * currentRobot.getSpeed();
+					currentRobot.MoveAndSlide(velocity);
+				}
+			}
+			if(globals.homeRobots.Count == globals.robotList.Count) {
+				roundOver = true;
+			}
+		}
+	}
+
+	// Creates the children from the first two robot residents of every existing home.
+	private void createChildren() {
 		for(int i = 0; i < globals.homeSum; i++) {
 			var currentHomeResidents = globals.homeResidents[i];
 			if(currentHomeResidents.Count >= 2) {
@@ -223,50 +303,7 @@ public class root : Node2D
 		}
 	}
 
-
-	public void controlRobots()
-	{	
-		// Find closest food, look at it and move towards it
-		if((globals.foodList.Count > 0) | (globals.currentMode != "winter")) {
-			for(int i = 0; i < globals.robotList.Count; i++) {
-				var currentRobot = globals.robotList[i];
-				if(currentRobot != null) {
-					float closestDistance = 999999;
-					Vector2 closestFood = new Vector2(0, 0);
-					for(int y = 0; y < globals.foodList.Count; y++) {
-						var currentFood = globals.foodList[y];
-						if(currentFood != null) {
-							float currentDistance = currentRobot.Position.DistanceTo(currentFood.Position);
-							if(currentDistance < closestDistance) {
-								closestDistance = currentDistance;
-								closestFood = currentFood.Position;
-							}
-						}
-					}
-					Vector2 direction = currentRobot.Position.DirectionTo(closestFood);
-					currentRobot.LookAt(closestFood);
-					Vector2 velocity = direction * currentRobot.getSpeed();
-					currentRobot.MoveAndSlide(velocity);
-				}
-			}
-		} else {
-			activateHomes(true);
-			for(int i = 0; i < globals.robotList.Count; i++) {
-				var currentRobot = globals.robotList[i];
-				if(!currentRobot.getAtHome()) {
-					Vector2 housePos = homePosList[currentRobot.getHome()];
-					Vector2 direction = currentRobot.Position.DirectionTo(housePos);
-					currentRobot.LookAt(housePos);
-					Vector2 velocity = direction * currentRobot.getSpeed();
-					currentRobot.MoveAndSlide(velocity);
-				}
-			}
-			if(globals.homeRobots.Count == globals.robotList.Count) {
-				roundOver = true;
-			}
-		}
-	}
-
+	// Updates the user interface.
 	public void updateUI() {
 
 		//Round Stats
@@ -305,11 +342,8 @@ public class root : Node2D
 			countdownLabel.Modulate = Color.Color8(255, 38, 38);
 		}
 	}
-	
-	public void _on_countdownTimer_timeout() {
-		countdownValue -= 1;
-	}
 
+	// Drains the hunger of every robot at the end of every season.
 	public void drainHunger() {
 		for(int i = 0; i < globals.robotList.Count; i++) {
 			var currentRobot = globals.robotList[i];
@@ -321,6 +355,7 @@ public class root : Node2D
 		}
 	}
 
+	// Kills starving robots at the end of every season.
 	public void deathCheck() {
 		var deadRobotList = new Godot.Collections.Array<robot>();
 
@@ -336,6 +371,7 @@ public class root : Node2D
 		}
 	}
 
+	// Deactivates homes when not needed, reactives them when needed.
 	public void activateHomes(bool activate) {
 		for(int id = 0; id < globals.homeList.Count; id++) {
 			if(globals.homeList[id] != null) {
@@ -344,6 +380,13 @@ public class root : Node2D
 		}
 	} 
 
+	// -- Signal Funcs
+	// Reduces the timer by 1 every second.
+	public void _on_countdownTimer_timeout() {
+		countdownValue -= 1;
+	}
+
+	// Changes relevant styling and position of UI elements when the close button is pressed.
 	public void _on_closeRoundButton_pressed() {
 		roundStatsOpen = !roundStatsOpen;
 		if(roundStatsOpen) {
@@ -361,6 +404,7 @@ public class root : Node2D
 		}
 	}
 
+	// Changes relevant styling and position of UI elements when the close button is pressed.
 	public void _on_closeRobotButton_pressed() {
 		robotStatsOpen = !robotStatsOpen;
 		if(robotStatsOpen) {

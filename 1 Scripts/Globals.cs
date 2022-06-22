@@ -7,31 +7,17 @@ public class Globals : Node
     public String currentMode;
     public int homeSum = 3;
 
-    public Godot.Collections.Array<Area2D> foodList = new Godot.Collections.Array<Area2D>();
-    public Godot.Collections.Array<robot> robotList = new Godot.Collections.Array<robot>();
-    public Godot.Collections.Array<home> homeList = new Godot.Collections.Array<home>();
-    public Godot.Collections.Array<Godot.Collections.Array<robot>> homeResidents = 
-    new Godot.Collections.Array<Godot.Collections.Array<robot>>();
+    public Godot.Collections.Array<Area2D> foodList = null;
+    public Godot.Collections.Array<robot> robotList = null;
+    public Godot.Collections.Array<home> homeList = null;
+    public Godot.Collections.Array<Godot.Collections.Array<robot>> homeResidents = null;
 
-    public Godot.Collections.Array<robot> homeRobots = new Godot.Collections.Array<robot>();
+    public Godot.Collections.Array<robot> homeRobots = null;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        currentRound = 1;
-        currentMode = "spring";
-
-        for(int i = 0; i < homeSum; i++) {
-            Godot.Collections.Array<robot> homeResidentsArray = 
-            new Godot.Collections.Array<robot>();
-            homeResidents.Add(homeResidentsArray);
-        }
-    }
-
-    public void resetHomeResidents() {
-        for(int i = 0; i < homeSum; i++) {
-            homeResidents[i].Clear();
-        }
+        initGlobals();
     }
 
     public void iterateRound() {
@@ -49,6 +35,25 @@ public class Globals : Node
             case "winter":
                 currentMode = "spring";
                 break;
+        }
+    }
+
+    public void initGlobals() {
+        foodList = new Godot.Collections.Array<Area2D>();
+        robotList = new Godot.Collections.Array<robot>();
+        homeList = new Godot.Collections.Array<home>();
+        homeRobots = new Godot.Collections.Array<robot>();
+        homeSum = 3;
+        initHomeResidents();
+        currentRound = 1;
+        currentMode = "spring";
+    }
+
+    public void initHomeResidents() {
+        homeResidents = new Godot.Collections.Array<Godot.Collections.Array<robot>>();
+        for(int i = 0; i < homeSum; i++) {
+            Godot.Collections.Array<robot> homeResidentsArray = new Godot.Collections.Array<robot>();
+            homeResidents.Add(homeResidentsArray);
         }
     }
 }
